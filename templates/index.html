@@ -1,0 +1,380 @@
+{% extends 'base.html' %}
+
+{% block title %} Dashboard {% endblock %}
+   
+{% block body %}
+{% include 'includes/header.html' %}
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-3 d-md-block bg-light sidebar" style="height: 80vh;">
+            <div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="width: 280px;">
+              <a href="" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+                  <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
+              </a>
+              <ul class="nav nav-pills flex-column mb-auto">
+                  <li class="nav-item">
+                    <a href="#" class="nav-link active" aria-current="page">
+                      <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
+                      Dashboard
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" class="nav-link link-dark">
+                      <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
+                      Products
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" class="nav-link link-dark">
+                      <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
+                      Ordasdaers
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" class="nav-link link-dark">
+                      <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+                      asdad
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" class="nav-link link-dark">
+                      <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+                      sdfsdfsdf
+                    </a>
+                  </li>
+                </ul>
+                <!-- <div class="dropdown align-items-md-end ">
+                  <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                    <strong>mdo</strong>
+                  </a>
+             
+                </div> -->
+          </div>
+              </div>
+<!-- Page Content -->
+<main class="col-md-9 ms-sm-auto col-lg-9 px-md-4" style="height: 80vh;">
+    <div class="modal" id="createInvestmentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Investment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createInvestmentForm" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="product" class="form-label">Product</label>
+                            <select class="form-select" id="product" name="product" required>
+                                {% for product in products %}
+                                    <option value="{{ product.id }}">{{ product.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="investmentAmount" class="form-label">Investment Amount</label>
+                            <input type="number" class="form-control" id="investmentAmount" name="investment_amount" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveInvestmentBtn">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+  <!-- Edit Investment Modal -->
+<div class="modal" id="editInvestmentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Investment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editInvestmentForm" method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Product</label>
+                        <p id="editProductName" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editInvestmentAmount" class="form-label">Investment Amount</label>
+                        <input type="number" class="form-control" id="editInvestmentAmount" name="investment_amount" required>
+                    </div>
+                    <input type="hidden" id="editCustomerId" name="customer_id">
+                    <input type="hidden" id="editProductId" name="product_id">
+                    <div class="mb-3">
+                        <label for="transactionType" class="form-label">Transaction Type</label>
+                        <select class="form-select" id="transactionType" name="transaction_type" required>
+                            <option value="add">Add</option>
+                            <option value="withdraw">Withdraw</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="updateInvestmentBtn">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Investment Modal -->
+
+
+
+
+<!-- Your page content goes here -->
+<div class="d-flex justify-content-between m-4">
+    <h1 class="mt-4">Dashboard</h1>
+    <button class="btn btn-primary h-25" data-bs-toggle="modal" data-bs-target="#createInvestmentModal">Create Investment</button>
+</div>
+
+<table class="table" id="investmentsTable">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Customer Name</th>
+            <th scope="col">Product</th>
+            <th scope="col">Investment</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody class="table-group-divider">
+        {% for portfolio in portfolios %}
+        <tr id="investment-{{ portfolio.customer.id }}-{{ portfolio.product.id }}">
+            <td>{{ forloop.counter }}</td>
+            <td>{{ portfolio.customer }}</td>
+            <td>{{ portfolio.product.name }}</td>
+            <td class="investment-amount">{{ portfolio.total_investment_amount }}</td>
+            <td>
+                <button class="btn btn-sm btn-primary edit-investment-btn" data-bs-toggle="modal" data-bs-target="#editInvestmentModal" data-customer="{{ portfolio.customer.id }}" data-product="{{ portfolio.product.id }}" data-product-name="{{ portfolio.product.name }}" data-investment="{{ portfolio.total_investment_amount }}">Edit</button>
+                <button class="btn btn-sm btn-danger delete-btn" data-bs-toggle="modal" data-bs-target="#deleteInvestmentModal{{ forloop.counter }}">Delete</button>
+            </td>
+        </tr>
+                <!-- Delete Investment Modal inside the loop -->
+                <div class="modal" id="deleteInvestmentModal{{ forloop.counter }}" tabindex="-1">
+                    
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Delete Investment</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to delete this investment?</p>
+                                    <!-- Hidden input field to store the investment ID -->
+                                    <input type="hidden" class="deleteInvestmentId" value="{{ portfolio.id }}">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-danger confirmDeleteBtn">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+        {% empty %}
+        <tr>
+            <td colspan="5">No investments found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    
+</table>
+</main>
+</div>
+</div>
+
+{% include 'includes/footer.html' %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+
+
+$(document).ready(function() {
+
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+    $('#saveInvestmentBtn').click(function() {
+        $.ajax({
+            url: "{% url 'investment:dashboard' %}",
+            type: 'POST',
+            data: $('#createInvestmentForm').serialize(),
+            success: function(response) {
+                // Close the modal
+                $('#createInvestmentModal').modal('hide');
+                // Clear the form
+                $('#createInvestmentForm')[0].reset();
+
+                // Check if the investment row already exists
+                var investmentRowId = `investment-${response.customer_id}-${response.product_id}`;
+                var existingRow = $(`#${investmentRowId}`);
+
+                if (existingRow.length) {
+                    // Update the existing row
+                    existingRow.find('.investment-amount').text(response.investment_amount);
+                } else {
+                    // Append the new investment to the table
+                    var newInvestment = `
+                        <tr id="${investmentRowId}">
+                            <td></td> <!-- You can adjust the counter dynamically if needed -->
+                            <td>${response.customer}</td>
+                            <td>${response.product}</td>
+                            <td class="investment-amount">${response.investment_amount}</td>
+                        </tr>
+                    `;
+                    $('#investmentsTable tbody').append(newInvestment);
+                }
+
+                // Recalculate and update the row numbers
+                $('#investmentsTable tbody tr').each(function(index) {
+                    $(this).find('td:first').text(index + 1);
+                });
+            },
+            error: function(xhr, status, error) {
+                // Handle the error
+                console.error(error);
+            }
+        });
+    });
+
+     // Edit investment button click handler
+     $('#investmentsTable').on('click', '.edit-investment-btn', function() {
+        var customerId = $(this).data('customer');
+        var productId = $(this).data('product');
+        var productName = $(this).data('product-name');
+        var investmentAmount = $(this).data('investment');
+
+        $('#editCustomerId').val(customerId);
+        $('#editProductId').val(productId);
+        $('#editProductName').text(productName);
+        $('#editInvestmentAmount').val(investmentAmount);
+    });
+
+    // Update investment button click handler
+    $('#updateInvestmentBtn').click(function() {
+        var transactionType = $('#transactionType').val();
+        var investmentAmount = parseFloat($('#editInvestmentAmount').val());
+
+        if (transactionType === 'withdraw' && (isNaN(investmentAmount) || investmentAmount <= 0)) {
+            alert('Withdrawal amount must be greater than zero.');
+            return;
+        }
+
+        var csrftoken = getCookie('csrftoken');
+        $.ajax({
+            url: "{% url 'investment:dashboard' %}",
+            type: 'PUT',
+            headers: {
+                'X-CSRFToken': csrftoken // Include CSRF token in headers
+            },
+            data: $('#editInvestmentForm').serialize(),
+            success: function(response) {
+    if (response.status === 'error') {
+
+          // Display SweetAlert with error message
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.message,
+        });
+
+    } else {
+         // Close the modal
+         $('#editInvestmentModal').modal('hide');
+        
+        // Update the investment row
+        var investmentRowId = `investment-${response.customer_id}-${response.product_id}`;
+        var existingRow = $(`#${investmentRowId}`);
+
+        if (existingRow.length) {
+            existingRow.find('.investment-amount').text(response.investment_amount);
+        }
+
+        // Recalculate and update the row numbers
+        $('#investmentsTable tbody tr').each(function(index) {
+            $(this).find('td:first').text(index + 1);
+        });
+      
+    }
+},
+
+            error: function(xhr, status, error) {
+                // Handle the error
+                console.error(error);
+            }
+        });
+    });
+
+    $(".confirmDeleteBtn").click(function() {
+    // Find the hidden input within the modal's body
+    var investmentId = $(this).closest(".modal").find('.deleteInvestmentId').val();
+    console.log(investmentId, '111111111111111111111');
+    var csrftoken = getCookie("csrftoken");
+
+    var modal = $(this).closest(".modal");
+
+    $.ajax({
+        url: "/dashboard/delete/" + investmentId + "/",
+        type: "DELETE",
+        headers: {
+            "X-CSRFToken": csrftoken // Include CSRF token in headers
+        },
+        success: function(response) {
+            // Close the delete modal
+            modal.modal("hide");
+
+            // Remove the deleted investment row from the table
+            var deletedRow = $("#investment-" + investmentId);
+            deletedRow.remove();
+
+            // Show success message using SweetAlert
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Investment deleted successfully.',
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+            // Display an error message if deletion fails
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to delete investment. Please try again.',
+            });
+        }
+    });
+});
+
+
+
+});
+</script>
+
+{% endblock %}

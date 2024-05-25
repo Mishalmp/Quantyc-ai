@@ -1,0 +1,49 @@
+<!-- investment/templates/registration.html -->
+{% extends 'base.html' %}
+
+{% block title %} SignUP  {% endblock %}
+   
+{% block body %} 
+    <!-- Custom CSS -->
+    <style>
+        .form-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-container h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-container .btn-primary {
+            width: 100%;
+        }
+    </style>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="form-container">
+                    <h2>Registration</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="form-group mb-3">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <span class="text-danger ">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </form>
+                </div>
+            </div>
+            <a class="d-flex justify-content-center align-items-center" href="{% url 'investment:login' %}">Already have an account</a>
+
+        </div>
+    </div>
+    {% endblock %}

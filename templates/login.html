@@ -1,0 +1,48 @@
+<!-- investment/templates/login.html -->
+
+{% extends 'base.html' %}
+
+{% block title %} Login  {% endblock %}
+   
+{% block body %} 
+    
+
+<style>
+      .form-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-container h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-container .btn-primary {
+            width: 100%;
+        }
+
+</style>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="form-container">
+                    <h2>Login</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        {% if error %}
+                            <p class="text-danger ">{{ error }}</p>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                </div>
+            </div>
+            <a class="d-flex justify-content-center align-items-center" href="{% url 'investment:registration' %}">don't have an account</a>
+        </div>
+    </div>
+
+    <!-- {% include 'includes/footer.html' %} -->
+{% endblock %}
