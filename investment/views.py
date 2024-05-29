@@ -15,6 +15,8 @@ class LoginView(View):
     template_name = 'login.html'
 
     def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(self.get_redirect_url())
         form = LoginForm()
         return render(request, self.template_name, {'form': form})
 
@@ -26,11 +28,14 @@ class LoginView(View):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('investment:dashboard')
+                return redirect(self.get_redirect_url())
             else:
                 return render(request, self.template_name, {'form': form, 'error': 'Invalid credentials'})
         else:
             return render(request, self.template_name, {'form': form})
+
+    def get_redirect_url(self):
+        return reverse_lazy('investment:dashboard')
 
 
 
@@ -47,8 +52,10 @@ class RegistrationView(SuccessMessageMixin, CreateView):
         return self.render_to_response(self.get_context_data(form=form))
     
 
+from django.conf import settings
+
 class LogoutView(LoginRequiredMixin, RedirectView):
-    url = reverse_lazy('login')  # Redirect URL after logout
+    url = settings.LOGIN_URL  # Redirect URL after logout
     permanent = False  # Redirect is temporary
     query_string = True
 
@@ -117,6 +124,7 @@ class DashboardView(LoginRequiredMixin, View):
                 user_product_investment.total_investment_amount -= investment_amount
             else:
                 user_product_investment.total_investment_amount += investment_amount
+                
 
 
             user_product_investment.save()

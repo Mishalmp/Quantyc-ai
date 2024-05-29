@@ -54,12 +54,12 @@ def adjust_investment_amount(sender, instance, created, **kwargs):
 
 
 
-@receiver(pre_delete, sender=Transactions)
-def revert_adjustment(sender, instance, **kwargs):
-    if not instance.withdraw_money:
-        user_product_investment = UserProductInvestment.objects.get(
-            customer=instance.customer,
-            product=instance.product
-        )
-        user_product_investment.total_investment_amount -= instance.investment_amount
-        user_product_investment.save()
+# @receiver(pre_delete, sender=Transactions)
+# def revert_adjustment(sender, instance, **kwargs):
+#     if not instance.withdraw_money:
+#         user_product_investment = UserProductInvestment.objects.get(
+#             customer=instance.customer,
+#             product=instance.product
+#         )
+#         user_product_investment.total_investment_amount -= instance.investment_amount
+#         user_product_investment.save()
